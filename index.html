@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paying It Forward</title>
+<meta name="description" content="How are research outputs changing in the age of AI? A project from the Research Software Engineering team at the University of Sheffield.">
+<style>
+  :root { --bg:#fff; --fg:#1d2330; --muted:#5a6275; --accent:#1f5fbf; --card:#f4f6fa; --border:#dde2ec; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14171f; --fg:#e8eaf0; --muted:#9aa3b5; --accent:#7aa9ff; --card:#1c212c; --border:#2c3342; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:48px 16px 64px; }
+  h1 { font-size:2.4rem; line-height:1.15; margin:0 0 .3em; }
+  h2 { margin-top:2.2em; font-size:1.4rem; }
+  .lead { font-size:1.25rem; color:var(--muted); margin-bottom:1.5em; }
+  a { color:var(--accent); }
+  img { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; background:#fff; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 18px; }
+  dt { font-weight:600; margin-top:.8em; }
+  dd { margin:0; color:var(--muted); }
+  footer { margin-top:3em; padding-top:1em; border-top:1px solid var(--border); color:var(--muted); font-size:.9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Paying It Forward</h1>
+  <p class="lead">How are research outputs changing in the age of AI?</p>
+
+  <p>Paying It Forward aims to build a metric, or set of criteria, that describes whether a piece of research generates new research artefacts, and what kind of artefacts it produces.</p>
+  <p>We limit the scope to <strong>software</strong> and <strong>data</strong>. There are many other kinds of research artefact, such as new theoretical methodologies, hardware or protocols, but these two are where we start.</p>
+
+  <h2>The taxonomy</h2>
+  <p>Each paper is rated on two axes, giving nine categories from <code>S1D1</code> to <code>S3D3</code>.</p>
+  <div class="card">
+    <dl>
+      <dt>Generated (1)</dt>
+      <dd>New or substantially extended software or data that plays a substantial role in the research and is shared or published.</dd>
+      <dt>Used (2)</dt>
+      <dd>Existing software or data that plays a substantial role, but is not substantially developed by the research team.</dd>
+      <dt>None (3)</dt>
+      <dd>Software or data does not play a substantial role in achieving the research goals.</dd>
+    </dl>
+  </div>
+  <p>For example, a project that generates new software and uses existing data is <code>S1D2</code>.</p>
+  <p><img src="research_output_taxonomy.png" alt="Diagram of the research output taxonomy, combining software and data categories"></p>
+
+  <h2>Approach</h2>
+  <p>We are testing whether large language models, both local and via API, can classify papers into these categories reliably, and how their judgements compare with a manual pass by people.</p>
+
+  <h2>Links</h2>
+  <ul>
+    <li><a href="https://github.com/RSE-Sheffield/paying-it-forward">Project code and analysis on GitHub</a></li>
+    <li><a href="https://github.com/RSE-Sheffield">RSE Sheffield</a></li>
+  </ul>
+
+  <footer>A project of the <a href="https://rse.shef.ac.uk">Research Software Engineering team</a> at the University of Sheffield.</footer>
+</main>
+</body>
+</html>
