@@ -4,73 +4,364 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paying It Forward</title>
-<meta name="description" content="How are research outputs changing in the age of AI? A project from the Research Software Engineering team at the University of Sheffield.">
+<meta name="description" content="How are research outputs changing in the age of AI? A metric for whether research generates new software and data.">
 <style>
-  :root { --bg:#fff; --fg:#1d2330; --muted:#5a6275; --accent:#1f5fbf; --card:#f4f6fa; --border:#dde2ec; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#14171f; --fg:#e8eaf0; --muted:#9aa3b5; --accent:#7aa9ff; --card:#1c212c; --border:#2c3342; }
+  :root {
+    --bg:#fafbfd; --fg:#1b2133; --muted:#586078; --card:#ffffff; --soft:#f1f4fa; --border:#e1e6f0;
+    --sw:#4f46e5; --sw2:#818cf8; --da:#0d9488; --da2:#5eead4; --none:#9aa3b8;
+    --accent:#4f46e5; --shadow:0 1px 2px rgba(20,30,60,.06),0 6px 20px rgba(20,30,60,.06);
+    --hero1:#312e81; --hero2:#0f766e;
   }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
-  main { max-width:760px; margin:0 auto; padding:48px 16px 64px; }
-  h1 { font-size:2.4rem; line-height:1.15; margin:0 0 .3em; }
-  h2 { margin-top:2.2em; font-size:1.4rem; }
-  .lead { font-size:1.25rem; color:var(--muted); margin-bottom:1.5em; }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0f121a; --fg:#e8ebf4; --muted:#9aa3b8; --card:#171b26; --soft:#1d2230; --border:#2a3144;
+      --sw:#8b85ff; --sw2:#5b57c9; --da:#2dd4bf; --da2:#0f766e; --none:#6b738a;
+      --accent:#9ba6ff; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+      --hero1:#1e1b4b; --hero2:#064e4b;
+    }
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:72px; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
   a { color:var(--accent); }
-  img { max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px; background:#fff; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 18px; }
-  dt { font-weight:600; margin-top:.8em; }
-  dd { margin:0; color:var(--muted); }
-  .team { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
-  .team li { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 16px; text-align:center; }
-  .avatar { width:96px; height:96px; border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; background:var(--border); color:var(--muted); font-size:1.9rem; font-weight:600; overflow:hidden; }
-  .avatar img { width:100%; height:100%; object-fit:cover; border:0; border-radius:0; }
-  .name { font-weight:600; }
-  .affil { color:var(--muted); font-size:.92rem; }
-  footer { margin-top:3em; padding-top:1em; border-top:1px solid var(--border); color:var(--muted); font-size:.9rem; }
+  img { max-width:100%; height:auto; }
+  .wrap { max-width:980px; margin:0 auto; padding:0 16px; }
+
+  /* nav */
+  nav { position:sticky; top:0; z-index:10; background:color-mix(in srgb,var(--bg) 88%,transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); }
+  nav .wrap { display:flex; gap:4px; align-items:center; overflow-x:auto; white-space:nowrap; }
+  nav strong { margin-right:auto; padding:12px 8px 12px 0; }
+  nav a { text-decoration:none; color:var(--muted); font-size:.92rem; padding:12px 10px; }
+  nav a:hover { color:var(--fg); }
+
+  /* hero */
+  .hero { background:linear-gradient(135deg,var(--hero1),var(--hero2)); color:#fff; padding:72px 0 80px; position:relative; overflow:hidden; }
+  .hero::before,.hero::after { content:""; position:absolute; border-radius:50%; filter:blur(2px); opacity:.18; background:#fff; }
+  .hero::before { width:420px; height:420px; right:-120px; top:-160px; }
+  .hero::after { width:240px; height:240px; right:180px; bottom:-140px; }
+  .hero .wrap { position:relative; z-index:1; }
+  .eyebrow { text-transform:uppercase; letter-spacing:.14em; font-size:.8rem; opacity:.8; }
+  .hero h1 { font-size:clamp(2.4rem,7vw,4rem); line-height:1.05; margin:.2em 0 .25em; }
+  .hero .lead { font-size:clamp(1.1rem,2.6vw,1.45rem); max-width:640px; opacity:.92; margin:0 0 1.4em; }
+  .btns { display:flex; flex-wrap:wrap; gap:10px; }
+  .btn { display:inline-block; padding:10px 18px; border-radius:999px; text-decoration:none; font-weight:600; font-size:.95rem; }
+  .btn.primary { background:#fff; color:#1e1b4b; }
+  .btn.ghost { border:1px solid rgba(255,255,255,.5); color:#fff; }
+  .btn:hover { transform:translateY(-1px); }
+
+  /* sections */
+  section { padding:56px 0 8px; }
+  h2 { font-size:1.8rem; line-height:1.2; margin:0 0 .3em; }
+  h2 small { display:block; font-size:.78rem; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); margin-bottom:6px; }
+  .sub { color:var(--muted); margin:0 0 1.4em; max-width:680px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); }
+
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:center; }
+  .figure { padding:12px; background:#fff; }
+  .figure img { display:block; border-radius:8px; margin:0 auto; }
+  .figure figcaption { font-size:.82rem; color:#586078; text-align:center; padding-top:8px; }
+  .pills { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .pill { padding:4px 12px; border-radius:999px; font-size:.85rem; font-weight:600; background:var(--soft); border:1px solid var(--border); }
+  .pill.s { color:var(--sw); } .pill.d { color:var(--da); }
+
+  /* generic details */
+  details.block { background:var(--card); border:1px solid var(--border); border-radius:14px; margin:12px 0; box-shadow:var(--shadow); overflow:hidden; }
+  details.block > summary { padding:16px 20px; font-weight:650; cursor:pointer; list-style:none; display:flex; align-items:center; gap:12px; }
+  details.block > summary::-webkit-details-marker, details.cat > summary::-webkit-details-marker { display:none; }
+  summary::after { content:""; margin-left:auto; width:9px; height:9px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); transition:transform .2s; flex:none; }
+  details[open] > summary::after { transform:rotate(-135deg); }
+  details.block > .inner { padding:0 20px 20px; }
+
+  table { width:100%; border-collapse:collapse; font-size:.95rem; }
+  th,td { text-align:left; vertical-align:top; padding:12px; border-top:1px solid var(--border); }
+  th { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; border-top:0; }
+  td:first-child { font-weight:650; white-space:nowrap; }
+  blockquote { margin:0 0 8px; padding-left:12px; border-left:3px solid var(--border); color:var(--muted); font-size:.9rem; }
+  .table-wrap { overflow-x:auto; }
+
+  .callout { background:var(--soft); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; margin:0 0 18px; }
+
+  .defs { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .def { display:flex; gap:14px; background:var(--soft); border-radius:12px; padding:16px; border:1px solid var(--border); }
+  .def h4 { margin:0 0 4px; font-size:1rem; } .def p { margin:0; font-size:.92rem; color:var(--muted); }
+  .dcode { flex:none; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-weight:800; color:#fff; }
+  .def.S1 .dcode { background:var(--sw); } .def.S2 .dcode { background:var(--sw2); } .def.S3 .dcode { background:var(--none); }
+  .def.D1 .dcode { background:var(--da); } .def.D2 .dcode { background:var(--da2); color:#064e4b; } .def.D3 .dcode { background:var(--none); }
+
+  .rules { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; counter-reset:r; }
+  .rule { padding:22px 20px 20px; position:relative; counter-increment:r; }
+  .rule::before { content:counter(r); display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--sw),var(--da)); color:#fff; font-weight:800; margin-bottom:10px; }
+  .rule h3 { margin:0 0 6px; font-size:1.05rem; } .rule p { margin:0; color:var(--muted); font-size:.93rem; }
+
+  /* matrix */
+  .matrix { display:grid; grid-template-columns:auto repeat(3,1fr); gap:8px; align-items:stretch; margin-bottom:28px; }
+  .axis { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; display:flex; align-items:center; justify-content:center; text-align:center; padding:4px; }
+  .axis.d { color:var(--da); } .axis.s { color:var(--sw); justify-content:flex-end; text-align:right; max-width:84px; }
+  .corner { }
+  .cell { text-decoration:none; color:var(--fg); background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 12px; display:flex; flex-direction:column; gap:2px; position:relative; box-shadow:var(--shadow); transition:transform .15s, border-color .15s; border-left:6px solid var(--sw); border-bottom:6px solid var(--da); }
+  .cell.s2 { border-left-color:var(--sw2); } .cell.s3 { border-left-color:var(--none); }
+  .cell.d2 { border-bottom-color:var(--da2); } .cell.d3 { border-bottom-color:var(--none); }
+  .cell:hover { transform:translateY(-3px); border-color:var(--accent); }
+  .cell .code { font-weight:800; font-size:1.2rem; letter-spacing:.02em; }
+  .cell .lbl { font-size:.8rem; color:var(--muted); line-height:1.35; }
+  .toolbar { display:flex; gap:8px; margin:0 0 12px; }
+  .toolbar button { font:inherit; font-size:.88rem; padding:6px 14px; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--fg); cursor:pointer; }
+  .toolbar button:hover { border-color:var(--accent); }
+
+  /* category accordions */
+  details.cat { background:var(--card); border:1px solid var(--border); border-radius:14px; margin:10px 0; box-shadow:var(--shadow); overflow:hidden; border-left:6px solid var(--sw); }
+  details.cat.s2 { border-left-color:var(--sw2); } details.cat.s3 { border-left-color:var(--none); }
+  details.cat > summary { padding:16px 18px; cursor:pointer; list-style:none; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .cat .code { font-weight:800; font-size:1.15rem; background:var(--soft); border-radius:8px; padding:2px 10px; }
+  .cat .ttl { font-weight:650; }
+  .chips { display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
+  .chip { font-size:.75rem; padding:2px 10px; border-radius:999px; color:#fff; }
+  .chip b { font-weight:800; }
+  .chip.S1 { background:var(--sw); } .chip.S2 { background:var(--sw2); } .chip.S3 { background:var(--none); }
+  .chip.D1 { background:var(--da); } .chip.D2 { background:var(--da2); color:#064e4b; } .chip.D3 { background:var(--none); }
+  .cat summary::after { margin-left:6px; }
+  .cat .body { padding:0 20px 20px; }
+  .cat h3 { font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin:6px 0 10px; }
+  .note { background:var(--soft); border-radius:8px; padding:8px 14px; display:inline-block; margin:0 0 10px; }
+  .case { background:var(--soft); border-radius:10px; padding:14px 16px; margin-bottom:10px; border:1px solid var(--border); }
+  .case h4 { margin:0 0 4px; font-size:1rem; } .case p { margin:0; font-size:.94rem; color:var(--muted); }
+  .real { font-size:.92rem; }
+
+  /* team */
+  .team { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:16px; }
+  .team li { padding:22px 14px; text-align:center; background:var(--card); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); }
+  .avatar { width:104px; height:104px; border-radius:50%; margin:0 auto 12px; display:grid; place-items:center; background:linear-gradient(135deg,var(--sw2),var(--da)); color:#fff; font-size:2rem; font-weight:700; overflow:hidden; border:3px solid var(--card); outline:2px solid var(--border); }
+  .avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+  .name { font-weight:650; } .affil { color:var(--muted); font-size:.9rem; }
+
+  .funded { margin-top:56px; padding:28px 0 36px; border-top:1px solid var(--border); color:var(--muted); text-align:center; }
+  .funded strong { color:var(--fg); }
+  ul.links { padding-left:1.2em; }
+
+  @media (max-width:760px) {
+    .two,.defs,.rules { grid-template-columns:1fr; }
+    .chips { margin-left:0; width:100%; order:3; }
+    .matrix { grid-template-columns:62px repeat(3,1fr); gap:6px; }
+    .axis { font-size:.62rem; letter-spacing:.04em; }
+    .cell { padding:10px 8px; } .cell .lbl { display:none; } .cell .code { font-size:1rem; }
+    .hero { padding:52px 0 60px; }
+  }
+  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } * { transition:none !important; } }
 </style>
 </head>
 <body>
-<main>
-  <h1>Paying It Forward</h1>
-  <p class="lead">How are research outputs changing in the age of AI?</p>
 
-  <p>Paying It Forward aims to build a metric, or set of criteria, that describes whether a piece of research generates new research artefacts, and what kind of artefacts it produces.</p>
-  <p>We limit the scope to <strong>software</strong> and <strong>data</strong>. There are many other kinds of research artefact, such as new theoretical methodologies, hardware or protocols, but these two are where we start.</p>
-
-  <h2>The taxonomy</h2>
-  <p>Each paper is rated on two axes, giving nine categories from <code>S1D1</code> to <code>S3D3</code>.</p>
-  <div class="card">
-    <dl>
-      <dt>Generated (1)</dt>
-      <dd>New or substantially extended software or data that plays a substantial role in the research and is shared or published.</dd>
-      <dt>Used (2)</dt>
-      <dd>Existing software or data that plays a substantial role, but is not substantially developed by the research team.</dd>
-      <dt>None (3)</dt>
-      <dd>Software or data does not play a substantial role in achieving the research goals.</dd>
-    </dl>
+<nav>
+  <div class="wrap">
+    <strong>Paying It Forward</strong>
+    <a href="#overview">Overview</a>
+    <a href="#criteria">Criteria</a>
+    <a href="#categories">Categories</a>
+    <a href="#approach">Approach</a>
+    <a href="#team">Team</a>
   </div>
-  <p>For example, a project that generates new software and uses existing data is <code>S1D2</code>.</p>
-  <p><img src="research_output_taxonomy.png" alt="Diagram of the research output taxonomy, combining software and data categories"></p>
+</nav>
 
-  <h2>Approach</h2>
-  <p>We are testing whether large language models, both local and via API, can classify papers into these categories reliably, and how their judgements compare with a manual pass by people.</p>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Metascience project</div>
+    <h1>Paying It Forward</h1>
+    <p class="lead">How are research outputs changing in the age of AI?</p>
+    <div class="btns">
+      <a class="btn primary" href="#categories">Explore the nine categories</a>
+      <a class="btn ghost" href="https://github.com/RSE-Sheffield/paying-it-forward">View on GitHub</a>
+    </div>
+  </div>
+</header>
 
-  <h2>Team</h2>
+<main class="wrap">
+
+<section id="overview">
+  <h2><small>Overview</small>A metric for research artefacts</h2>
+  <div class="two">
+    <div>
+      <p>Paying It Forward builds a metric, or set of criteria, that describes whether a piece of research generates new research artefacts, and what kind of artefacts it produces.</p>
+      <p>We limit the scope to <strong>software</strong> and <strong>data</strong>. Arguably, there are many other types of research artefact, such as a new theoretical methodology, hardware or protocols.</p>
+      <div class="pills"><span class="pill s">Software: generated · used · none</span><span class="pill d">Data: generated · used · none</span></div>
+    </div>
+    <figure class="card figure" style="margin:0">
+      <img src="research_output_taxonomy.png" alt="Typology of the nine metric outputs, combining software and data categories">
+      <figcaption>Typology of the different metric outputs, depending on the outputs of a research paper.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="criteria">
+  <h2><small>Criteria</small>What counts, and how we decide</h2>
+  <p class="sub">Open each panel for the detail. Every paper gets one rating for software (S1–S3) and one for data (D1–D3).</p>
+
+  <details class="block">
+    <summary>What do we mean by data, software and “other”?</summary>
+    <div class="inner table-wrap">
+      <table>
+        <thead><tr><th></th><th>Definition</th><th>Typical evidence in a paper</th></tr></thead>
+        <tbody>
+          <tr><td>Research Data</td>
+            <td><blockquote>“Research data can be defined as ‘recorded factual material commonly retained by and accepted in the scientific community as necessary to validate research findings’. Although the majority of such data is created in digital format, all research data is included in the definition, irrespective of the format in which it is created.” – UKRI, 2026 (<a href="https://www.ukri.org/who-we-are/epsrc/our-policies-and-standards/policy-framework-on-research-data/scope-and-benefits">source</a>)</blockquote>A collection of observations or information produced, collected, processed or released by the research.</td>
+            <td>Dataset, corpus, database, annotations, benchmark data, supplementary data, model weights, lab books</td></tr>
+          <tr><td>Research Software</td>
+            <td><blockquote>“Research Software includes source code files, algorithms, scripts, computational workflows and executables that were created during the research process or for a research purpose. Software Components (e.g. operating systems, libraries, dependencies, packages, scripts, etc.) that are used for research but were not created during or with a clear research intent should be considered software in research and not Research Software.” (<a href="https://doi.org/10.5281/zenodo.5504015">10.5281/zenodo.5504015</a>)</blockquote>An executable computational artefact produced or used as part of the research.</td>
+            <td>Source code, package, scripts, application, model implementation</td></tr>
+          <tr><td>Other</td>
+            <td>Research artefacts that are neither data nor software.</td>
+            <td>Hardware, physical materials, protocols, instruments, figures, documentation, experimental designs, or simply no research artefacts produced outside of the paper, such as a literature review</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="block" open>
+    <summary>The scale: generated, used, or not relevant</summary>
+    <div class="inner">
+      <div class="callout"><strong>Substantial role:</strong> the software or data is materially involved in producing, analysing, validating, or enabling the research results, rather than being used only for incidental, administrative, or routine purposes.</div>
+      <div class="defs">
+<div class="def S1"><div class="dcode">S1</div><div><h4>Research Software Generated</h4><p>New or substantially extended software that plays a substantial role in achieving the research goals, or is itself a research goal. It should not be a utility but rather represent substantial research effort. The paper should describe how the research created or significantly extended research software. Crucially, the software created should generate new knowledge.</p></div></div>
+<div class="def S2"><div class="dcode">S2</div><div><h4>Research Software Used</h4><p>Existing software that plays a substantial role in achieving the research goals, but is not substantially generated or extended by the research team. It should not be a utility but rather represent substantial research effort. The paper should describe how the research uses existing research software, and the software used should generate new knowledge.</p></div></div>
+<div class="def S3"><div class="dcode">S3</div><div><h4>No Research Software</h4><p>Either software is not used, or the software used does not create new knowledge but instead acts as a utility, or does not play a substantial role in achieving the research goals.</p></div></div>
+<div class="def D1"><div class="dcode">D1</div><div><h4>Research Data Generated</h4><p>New or substantially extended data that plays a substantial role in achieving the research goals, or is itself a research goal. The paper should describe how the research created or significantly extended research data. Crucially, the data created should generate new knowledge.</p></div></div>
+<div class="def D2"><div class="dcode">D2</div><div><h4>Research Data Used</h4><p>Existing data that plays a substantial role in achieving the research goals, but is not substantially generated or extended by the research team. The paper should describe how the research used existing research data, and the data used should generate new knowledge.</p></div></div>
+<div class="def D3"><div class="dcode">D3</div><div><h4>No Research Data</h4><p>Either research data is not used, or the data used does not create new knowledge. Data does not play a substantial role in achieving the research goals.</p></div></div>
+
+      </div>
+    </div>
+  </details>
+
+  <h3 style="margin:28px 0 12px">Some general rules</h3>
+  <div class="rules">
+    <div class="card rule"><h3>Generated implies used</h3><p>If a paper both <strong>uses</strong> and <strong>generates</strong> software or data, it belongs in the generated category. We assume that anything generated is also used.</p></div>
+    <div class="card rule"><h3>When unclear, go higher</h3><p>If the right category is unclear, err towards the higher number. <strong>Generated (1)</strong> needs clear evidence that the research produced it; otherwise classify it as <strong>used (2)</strong>.</p></div>
+    <div class="card rule"><h3>The paper is the ground truth</h3><p>If a paper says it generated software or data but gives no way to access it, we still count it as S1 or D1. Future work packages will assess data stewardship and FAIRness.</p></div>
+  </div>
+</section>
+
+<section id="categories">
+  <h2><small>Categories</small>The nine categories</h2>
+  <p class="sub">Software runs down the side, data across the top. Pick a cell to jump to examples of that category.</p>
+
+  <div class="matrix" aria-label="Category matrix">
+    <div class="corner"></div>
+    <div class="axis d">Data generated</div><div class="axis d">Data used</div><div class="axis d">No data</div>
+<div class="axis s">Software generated</div>
+<a class="cell s1 d1" href="#s1d1"><span class="code">S1D1</span><span class="lbl">Software generated<br>data generated</span></a>
+<a class="cell s1 d2" href="#s1d2"><span class="code">S1D2</span><span class="lbl">Software generated<br>data used</span></a>
+<a class="cell s1 d3" href="#s1d3"><span class="code">S1D3</span><span class="lbl">Software generated<br>no data</span></a>
+<div class="axis s">Software used</div>
+<a class="cell s2 d1" href="#s2d1"><span class="code">S2D1</span><span class="lbl">Software used<br>data generated</span></a>
+<a class="cell s2 d2" href="#s2d2"><span class="code">S2D2</span><span class="lbl">Software used<br>data used</span></a>
+<a class="cell s2 d3" href="#s2d3"><span class="code">S2D3</span><span class="lbl">Software used<br>no data</span></a>
+<div class="axis s">No software</div>
+<a class="cell s3 d1" href="#s3d1"><span class="code">S3D1</span><span class="lbl">No software<br>data generated</span></a>
+<a class="cell s3 d2" href="#s3d2"><span class="code">S3D2</span><span class="lbl">No software<br>data used</span></a>
+<a class="cell s3 d3" href="#s3d3"><span class="code">S3D3</span><span class="lbl">No software<br>no data</span></a>
+
+  </div>
+
+  <div class="toolbar">
+    <button type="button" id="expand">Expand all</button>
+    <button type="button" id="collapse">Collapse all</button>
+  </div>
+<details class="cat s1 d1" id="s1d1">
+  <summary><span class="code">S1D1</span><span class="ttl">Software + Data generated</span><span class="chips"><span class="chip S1"><b>S1</b> Generated</span><span class="chip D1"><b>D1</b> Generated</span></span></summary>
+  <div class="body"><h3>Hypothetical case studies</h3>
+<article class="case"><h4>A Machine Learning Framework for Detecting Urban Air Pollution</h4><p>Researchers develop and release a Python software package for training and evaluating pollution-prediction models. They also collect measurements from 50 monitoring stations and create and release a new dataset of air-quality observations.</p></article>
+</div>
+</details>
+<details class="cat s1 d2" id="s1d2">
+  <summary><span class="code">S1D2</span><span class="ttl">Software generated, Data used</span><span class="chips"><span class="chip S1"><b>S1</b> Generated</span><span class="chip D2"><b>D2</b> Used</span></span></summary>
+  <div class="body"><h3>Hypothetical case studies</h3>
+<article class="case"><h4>A New Algorithm for Identifying Cancer Cells in Microscopy Images</h4><p>Researchers develop and release a new image-analysis software package. They evaluate it using an existing publicly available microscopy dataset. The dataset is important to the research, but the researchers do not substantially create or extend it.</p></article>
+</div>
+</details>
+<details class="cat s1 d3" id="s1d3">
+  <summary><span class="code">S1D3</span><span class="ttl">Software generated, No data</span><span class="chips"><span class="chip S1"><b>S1</b> Generated</span><span class="chip D3"><b>D3</b> None</span></span></summary>
+  <div class="body"><p class="note">Often called a <em>tool paper</em>.</p><h3>Hypothetical case studies</h3>
+<article class="case"><h4>A Digital Tool for Reconstructing Ancient Musical Scales</h4><p>Researchers develop and release a software application that allows researchers to reconstruct and compare ancient musical scales from specified theoretical parameters. The software itself is the principal research output, and the study does not generate or analyse a substantive research dataset.</p></article>
+</div>
+</details>
+<details class="cat s2 d1" id="s2d1">
+  <summary><span class="code">S2D1</span><span class="ttl">Software used, Data generated</span><span class="chips"><span class="chip S2"><b>S2</b> Used</span><span class="chip D1"><b>D1</b> Generated</span></span></summary>
+  <div class="body"><h3>Hypothetical case studies</h3>
+<article class="case"><h4>Measuring Bird Populations Using Automated Acoustic Monitoring</h4><p>Researchers collect audio recordings from forests and create a new annotated dataset of bird calls and species observations. They use an existing acoustic-analysis software package to process the recordings, but do not substantially modify or extend the software or publish it as a research output.</p></article>
+<article class="case"><h4>The Effect of Soil Composition on Plant Growth</h4><p>Researchers conduct a controlled greenhouse experiment measuring plant growth under different soil conditions. Measurements from the experiment form a new dataset that is released with the paper. Data collection and analysis rely on existing laboratory and statistical software, which the researchers do not substantially modify or release.</p></article>
+</div>
+</details>
+<details class="cat s2 d2" id="s2d2">
+  <summary><span class="code">S2D2</span><span class="ttl">Software used, Data used</span><span class="chips"><span class="chip S2"><b>S2</b> Used</span><span class="chip D2"><b>D2</b> Used</span></span></summary>
+  <div class="body"><h3>Hypothetical case studies</h3>
+<article class="case"><h4>Evaluating Climate Change Effects on Crop Yields</h4><p>Researchers use data-analysis software to analyse an existing agricultural dataset. Both the software and dataset make substantial contributions to the research, but neither is substantially developed or generated by the researchers <strong>in this paper</strong>.</p></article>
+<article class="case"><h4>Genetic and Environmental Risk Factors for Cardiovascular Disease</h4><p>Researchers analyse genetic, demographic, and health information from participants in an existing biobank. They use established bioinformatics and statistical software to identify associations between genetic variants and cardiovascular outcomes. The biobank data and software are both substantial to the research, but the researchers do not generate a new dataset or develop the software as part of the study.</p></article>
+</div>
+</details>
+<details class="cat s2 d3" id="s2d3">
+  <summary><span class="code">S2D3</span><span class="ttl">Software used, No data</span><span class="chips"><span class="chip S2"><b>S2</b> Used</span><span class="chip D3"><b>D3</b> None</span></span></summary>
+  <div class="body"><p class="note">This combination is very rare.</p><h3>Hypothetical case studies</h3>
+<article class="case"><h4>Formal Verification of a Mathematical Proof Using an Existing Proof Assistant</h4><p>Researchers use an established theorem-proving system to formally verify a mathematical result. The proof assistant is central to the research but is not substantially developed or extended by the researchers.</p></article>
+<p class="real"><b>Real-world examples:</b> <a href="https://isa-afp.org/">Archive of Formal Proofs</a> · <a href="https://www.preprints.org/manuscript/202609.1374">Example preprint</a></p></div>
+</details>
+<details class="cat s3 d1" id="s3d1">
+  <summary><span class="code">S3D1</span><span class="ttl">No software, Data generated</span><span class="chips"><span class="chip S3"><b>S3</b> None</span><span class="chip D1"><b>D1</b> Generated</span></span></summary>
+  <div class="body"><h3>Hypothetical case studies</h3>
+<article class="case"><h4>A Survey of Public Attitudes Towards Renewable Energy</h4><p>Researchers conduct a survey of 5,000 participants and create and release an anonymised dataset of survey responses. The dataset is a substantial research output. Although general use software like word processors is used, the research does not involve software playing a substantial role in achieving its goals.</p></article>
+<article class="case"><h4>Variation in Leaf Morphology Across Coastal Plant Populations</h4><p>Researchers collect physical specimens from several coastal plant populations and record measurements of leaf size, shape, and structure. These observations form a new dataset that is reported and made available as a research output. Although they record their data in a spreadsheet, software does not play a substantial role in achieving the research goals.</p></article>
+</div>
+</details>
+<details class="cat s3 d2" id="s3d2">
+  <summary><span class="code">S3D2</span><span class="ttl">No software, Data used</span><span class="chips"><span class="chip S3"><b>S3</b> None</span><span class="chip D2"><b>D2</b> Used</span></span></summary>
+  <div class="body"><h3>Hypothetical case studies</h3>
+<article class="case"><h4>Historical Trends in Global Life Expectancy</h4><p>Researchers analyse an existing demographic dataset to investigate long-term trends in life expectancy. The dataset is central to the research, but no new or substantially extended dataset is produced. Software does not play a substantial role in achieving the research goals. Although data is stored and plotted in a spreadsheet, this is not deemed as software playing a substantial role.</p></article>
+<article class="case"><h4>Reinterpreting Themes in Early Twentieth-Century Poetry</h4><p>Researchers examine an existing collection of digitised poems to investigate changing representations of nature. The corpus is an important source of evidence, but no new dataset is produced and software does not play a substantial role in the research.</p></article>
+</div>
+</details>
+<details class="cat s3 d3" id="s3d3">
+  <summary><span class="code">S3D3</span><span class="ttl">No software, No data</span><span class="chips"><span class="chip S3"><b>S3</b> None</span><span class="chip D3"><b>D3</b> None</span></span></summary>
+  <div class="body"><h3>Hypothetical case studies</h3>
+<article class="case"><h4>A Conceptual Framework for Understanding Scientific Collaboration</h4><p>Researchers develop a theoretical framework explaining how collaboration influences scientific discovery, drawing on existing literature and conceptual reasoning. Neither software nor data plays a substantial role in achieving the research goals.</p></article>
+<article class="case"><h4>Literature review of global warming</h4><p>A review of existing work that produces no research artefacts outside of the paper itself.</p></article>
+<article class="case"><h4>Position or opinion paper, or theoretical algorithm</h4><p>Argument or theory is the contribution; no software or data plays a substantial role.</p></article>
+<article class="case"><h4>Experimental protocol (e.g. for medical trials)</h4><p>Details of an experimental procedure published before any investigation is carried out. The protocol sets out what data <em>will be collected</em> and what software <em>will be written</em> to analyse the data, but neither are contributed <em>in this paper</em>.</p></article>
+</div>
+</details>
+
+</section>
+
+<section id="approach">
+  <h2><small>Approach</small>Can AI classify papers?</h2>
+  <p class="sub">We are testing whether large language models, both local and via API, can classify papers into these categories reliably, and how their judgements compare with a manual pass by people.</p>
+  <ul class="links">
+    <li><a href="https://github.com/RSE-Sheffield/paying-it-forward">Project code and analysis on GitHub</a></li>
+  </ul>
+</section>
+
+<section id="team">
+  <h2><small>Team</small>Who we are</h2>
   <ul class="team">
     <li><div class="avatar"><img src="img/mf.jpg" alt="Michael Foster"></div><div class="name">Michael Foster</div><div class="affil">University of Sheffield</div></li>
     <li><div class="avatar"><img src="img/eb.jpg" alt="Edwin Brown"></div><div class="name">Edwin Brown</div><div class="affil">University of Sheffield</div></li>
-    <li><div class="avatar" aria-hidden="true">MS</div><div class="name">Matt Spick</div><div class="affil">University of Surrey</div></li>
-    <li><div class="avatar" aria-hidden="true">DH</div><div class="name">Daren Howell</div><div class="affil">CrewCreate</div></li>
-    <li><div class="avatar" aria-hidden="true">GR</div><div class="name">George Regkoukos</div><div class="affil">University College London</div></li>
+    <li><div class="avatar"><span aria-hidden="true">MS</span></div><div class="name">Matt Spick</div><div class="affil">University of Surrey</div></li>
+    <li><div class="avatar"><span aria-hidden="true">DH</span></div><div class="name">Daren Howell</div><div class="affil">CrewCreate</div></li>
+    <li><div class="avatar"><span aria-hidden="true">GR</span></div><div class="name">George Regkoukos</div><div class="affil">University College London</div></li>
   </ul>
+</section>
 
-  <h2>Links</h2>
-  <ul>
-    <li><a href="https://github.com/RSE-Sheffield/paying-it-forward">Project code and analysis on GitHub</a></li>
-  </ul>
-
-  <footer>Funded by the UKRI Metascience Unit.</footer>
 </main>
+
+<footer class="funded"><div class="wrap">Funded by the <strong>UKRI Metascience Unit</strong>.</div></footer>
+
+<script>
+  var cats = document.querySelectorAll('details.cat');
+  function openHash() {
+    var el = location.hash && document.querySelector(location.hash);
+    if (el && el.tagName === 'DETAILS') { el.open = true; }
+  }
+  window.addEventListener('hashchange', openHash);
+  openHash();
+  document.getElementById('expand').onclick = function () { cats.forEach(function (d) { d.open = true; }); };
+  document.getElementById('collapse').onclick = function () { cats.forEach(function (d) { d.open = false; }); };
+</script>
 </body>
 </html>
