@@ -21,6 +21,12 @@
   .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 18px; }
   dt { font-weight:600; margin-top:.8em; }
   dd { margin:0; color:var(--muted); }
+  .team { list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+  .team li { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:20px 16px; text-align:center; }
+  .avatar { width:96px; height:96px; border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; background:var(--border); color:var(--muted); font-size:1.9rem; font-weight:600; overflow:hidden; }
+  .avatar img { width:100%; height:100%; object-fit:cover; border:0; border-radius:0; }
+  .name { font-weight:600; }
+  .affil { color:var(--muted); font-size:.92rem; }
   footer { margin-top:3em; padding-top:1em; border-top:1px solid var(--border); color:var(--muted); font-size:.9rem; }
 </style>
 </head>
@@ -49,6 +55,15 @@
 
   <h2>Approach</h2>
   <p>We are testing whether large language models, both local and via API, can classify papers into these categories reliably, and how their judgements compare with a manual pass by people.</p>
+
+  <h2>Team</h2>
+  <ul class="team">
+    <li><div class="avatar" aria-hidden="true">MF</div><div class="name">Michael Foster</div><div class="affil">University of Sheffield</div></li>
+    <li><div class="avatar" aria-hidden="true">EB</div><div class="name">Edwin Brown</div><div class="affil">University of Sheffield</div></li>
+    <li><div class="avatar" aria-hidden="true">MS</div><div class="name">Matt Spick</div><div class="affil">University of Surrey</div></li>
+    <li><div class="avatar" aria-hidden="true">DH</div><div class="name">Daren Howell</div><div class="affil">CrewCreate</div></li>
+    <li><div class="avatar" aria-hidden="true">GR</div><div class="name">George Regkoukos</div><div class="affil">University College London</div></li>
+  </ul>
 
   <h2>Links</h2>
   <ul>
